@@ -25,18 +25,14 @@ def read_graph_from_file(file_path):
 
 
 def get_max_degree(graph):
-    max_degree = 0
-    for key in graph:
-        max_degree = max(max_degree, len(graph[key]))
-        max_key = key
-    return f"Max => V:{max_key}, Degree:{max_degree}"
-
+    max_degree = max(graph, key=lambda k: len(graph[k]))
+    
+    return f"Max => V:{max_degree}, D:{len(graph[max_degree])}"
+        
 def get_min_degree(graph):
-    min_degree = 100000000
-    for key in graph:
-        min_degree = min(min_degree, len(graph[key]))
-        min_key = key
-    return f"Min => V:{min_key}, Degree:{min_degree}"
+    min_degree = min(graph, key=lambda k: len(graph[k]))
+    
+    return f"Min => V:{min_degree}, D:{len(graph[min_degree])}"
 
 def get_adjacent_list(graph):
     for key in graph:
@@ -51,10 +47,8 @@ def get_adjacent_matrix(graph):
 file_path = 'example_input.txt'
 graph = read_graph_from_file(file_path)
 
-print(get_max_degree(graph))
-print("====================================")
-print(get_min_degree(graph))
-print("====================================")
+print(graph)
 print(get_adjacent_list(graph))
 print("====================================")
 get_adjacent_matrix(graph)
+print("======================================")

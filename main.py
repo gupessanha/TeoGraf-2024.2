@@ -44,6 +44,40 @@ class Graph:
             s += str(i) + "\n"
         return s
     
+    def vertices(self):
+        return len(self.nodes)
+    
+    def edges(self):
+        edges = 0
+        for i in self.nodes:
+            edges += len(i.adj)
+        return edges//2
+    
+    def degree(self, node):
+        return len(node.adj)
+    
+    def max_degree(self):
+        max = 0
+        for i in self.nodes:
+            if len(i.adj) > max:
+                max = len(i.adj)
+        return f"Vertice: {i.value}, Degree: {max}"
+    
+    def min_degree(self):
+        min = 100000000
+        for i in self.nodes:
+            if len(i.adj) < min:
+                min = len(i.adj)
+        return f"Vertice: {i.value}, Degree: {min}"
+    
 grafo = Graph()
 grafo.load_from_file("example_input.txt")
 print(grafo)
+print("=====================================\n")
+print("Vertices:", grafo.vertices())
+print("=====================================\n")
+print("Edges:", grafo.edges())
+print("=====================================\n")
+print("Max degree => " + grafo.max_degree())
+print("=====================================\n")
+print("Min degree => " + grafo.min_degree())

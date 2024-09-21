@@ -181,7 +181,7 @@ def print_out(graph):
         
         
 # Caminho para o arquivo de entrada
-file_path = 'example_input.txt'
+file_path = 'grafo_1.txt'
 # Lê o grafo do arquivo
 graph = read_graph_from_file(file_path)
 # Imprime informações sobre o grafo

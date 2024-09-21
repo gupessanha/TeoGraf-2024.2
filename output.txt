@@ -1,0 +1,14 @@
+Grafo
+Numero de vertices: 5
+Numero de arestas: 5
+Grau Maximo: Max => V:5, Grau:4
+Grau Medio: Med => 2.00
+Grau Minimo: Min => V:3, Grau:1
+Mediana dos Graus: Med => 2.00
+Lista de Adjacencia:[(1, [2, 5]), (2, [1, 5]), (5, [1, 2, 3, 4]), (3, [5]), (4, [5])]
+Matriz de Adjacencia:
+0 1 1 0 0
+1 0 1 0 0
+1 1 0 1 1
+0 0 1 0 0
+0 0 1 0 0

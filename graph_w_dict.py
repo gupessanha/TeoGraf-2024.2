@@ -43,12 +43,16 @@ def get_adjacent_matrix(graph):
     matrix = np.array(graph[i] for i in keys_l)
     print(matrix)
 
-
+def print_out(graph):
+    print("Vertices: ", len(graph))
+    print("Edges: ", sum(len(graph[k]) for k in graph)//2)
+    print(get_max_degree(graph))
+    print(get_min_degree(graph))
+    get_adjacent_list(graph)
+    get_adjacent_matrix(graph)
+    
+    
 file_path = 'example_input.txt'
 graph = read_graph_from_file(file_path)
 
-print(graph)
-print(get_adjacent_list(graph))
-print("====================================")
-get_adjacent_matrix(graph)
-print("======================================")
+print_out(graph)

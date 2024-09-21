@@ -139,17 +139,17 @@ def get_adjacent_list(graph):
     adj_list = []
     for key in graph:
         adj_list.append((key, graph[key]))
-    return adj_list
+    return '\n'.join(f"{key}: {', '.join(map(str, adjacents))}" for key, adjacents in adj_list)
         
 def get_adjacent_matrix(graph):
     """
-    Retorna a matriz de adjacência de um grafo representado por um dicionário.
+    Retorna a matriz de adjacência de um grafo representado por um dicionário, incluindo uma linha e coluna extra com os nomes dos vértices.
 
     Args:
         graph (dict): Um dicionário onde as chaves são os nós do grafo e os valores são listas de nós adjacentes.
 
     Returns:
-        list: Uma matriz de adjacência representada como uma lista de listas.
+        str: Uma string representando a matriz de adjacência com os nomes dos vértices.
     """
     nodes = list(graph.keys())
     size = len(nodes)
@@ -161,21 +161,23 @@ def get_adjacent_matrix(graph):
         for adjacent in adjacents:
             matrix[node_index[node]][node_index[adjacent]] = 1
     
-    return matrix
+    # Adiciona a linha e coluna extra com os nomes dos vértices
+    header = '  ' + ' '.join(map(str, nodes)) + '\n'
+    matrix_str = header
+    for i, node in enumerate(nodes):
+        matrix_str += str(node) + ' ' + ' '.join(map(str, matrix[i])) + '\n'
+    
+    return matrix_str
     
 
 def print_out(graph):
     """
     Imprime informações sobre um grafo em um arquivo de saída.
     """
-    text = f"Grafo\nNumero de vertices: {get_num_vertices(graph)}\nNumero de arestas: {get_num_edges(graph)}\nGrau Maximo: {get_max_degree(graph)}\nGrau Medio: {get_mean_degree(graph)}\nGrau Minimo: {get_min_degree(graph)}\nMediana dos Graus: {get_median_degree(graph)}\nLista de Adjacencia:{get_adjacent_list(graph)}\nMatriz de Adjacencia:\n"
+    text = f"Grafo\nNumero de vertices: {get_num_vertices(graph)}\nNumero de arestas: {get_num_edges(graph)}\nGrau Maximo: {get_max_degree(graph)}\nGrau Medio: {get_mean_degree(graph)}\nGrau Minimo: {get_min_degree(graph)}\nMediana dos Graus: {get_median_degree(graph)}\nLista de Adjacencia:\n{get_adjacent_list(graph)}\nMatriz de Adjacencia:\n{get_adjacent_matrix(graph)}\n"
     
     with open('output.txt', 'w') as file:
         file.write(text)
-        
-        matrix = get_adjacent_matrix(graph)
-        for row in matrix:
-            file.write(' '.join(map(str, row)) + '\n')
         
         
 # Caminho para o arquivo de entrada

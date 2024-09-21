@@ -40,6 +40,26 @@ def read_graph_from_file(file_path):
         
     return graph
 
+def get_num_vertices(graph):
+    """
+    Retorna o número de vértices em um grafo representado por um dicionário.
+    Args:
+        graph (dict): Um dicionário onde as chaves são vértices e os valores são listas de vértices adjacentes.
+    Returns:
+        int: O número de vértices no grafo.
+    """
+    return len(graph)
+
+def get_num_edges(graph):
+    """
+    Retorna o número de arestas em um grafo representado por um dicionário.
+    Args:
+        graph (dict): Um dicionário onde as chaves são vértices e os valores são listas de vértices adjacentes.
+    Returns:
+        int: O número de arestas no grafo.
+    """
+    return sum(len(graph[k]) for k in graph)//2
+
 def get_max_degree(graph):
     """
     Calcula o vértice com o maior grau em um grafo representado por um dicionário.
@@ -51,7 +71,20 @@ def get_max_degree(graph):
     # Encontra o vértice com o maior grau
     max_degree = max(graph, key=lambda k: len(graph[k]))
     
-    return f"Max => V:{max_degree}, D:{len(graph[max_degree])}"
+    return f"Max => V:{max_degree}, Grau:{len(graph[max_degree])}"
+
+def get_mean_degree(graph):
+    """
+    Calcula o grau médio de um grafo representado por um dicionário.
+    Args:
+        graph (dict): Um dicionário onde as chaves são vértices e os valores são listas de vértices adjacentes.
+    Returns:
+        float: O grau médio do grafo.
+    """
+    # Calcula o grau médio do grafo
+    mean_degree = sum(len(graph[k]) for k in graph) / len(graph)
+    
+    return f"Med => {mean_degree:.2f}"
         
 def get_min_degree(graph):
     """
@@ -59,16 +92,35 @@ def get_min_degree(graph):
     Parâmetros:
     graph (dict): Um dicionário onde as chaves são vértices e os valores são listas de vértices adjacentes.
     Retorna:
-    str: Uma string no formato "Min => V:{vértice}, D:{grau}" indicando o vértice com o menor grau e o valor do grau.
+    str: Uma string no formato "Min => V:{vértice}, Grau:{grau}" indicando o vértice com o menor grau e o valor do grau.
     """
     # Encontra o vértice com o menor grau
     min_degree = min(graph, key=lambda k: len(graph[k]))
     
-    return f"Min => V:{min_degree}, D:{len(graph[min_degree])}"
+    return f"Min => V:{min_degree}, Grau:{len(graph[min_degree])}"
+
+def get_median_degree(graph):
+    """
+    Calcula a mediana dos graus de um grafo representado por um dicionário.
+    Args:
+        graph (dict): Um dicionário onde as chaves são vértices e os valores são listas de vértices adjacentes.
+    Returns:
+        float: A mediana dos graus do grafo.
+    """
+    # Calcula a mediana dos graus do grafo
+    degrees = [len(graph[k]) for k in graph]
+    degrees.sort()
+    n = len(degrees)
+    if n % 2 == 0:
+        median_degree = (degrees[n//2 - 1] + degrees[n//2]) / 2
+    else:
+        median_degree = degrees[n//2]
+    
+    return f"Med => {median_degree:.2f}"
 
 def get_adjacent_list(graph):
     """
-    Imprime a lista de adjacência de um grafo.
+    Retorna a lista de adjacência de um grafo representado por um dicionário.
 
     Args:
         graph (dict): Um dicionário onde as chaves são os nós do grafo e os valores são listas de nós adjacentes.
@@ -80,62 +132,52 @@ def get_adjacent_list(graph):
             'C': ['A', 'D'],
             'D': ['B', 'C']
         }
-        get_adjacent_list(graph)
+        adj_list = get_adjacent_list(graph)
         # Saída:
-        # A ['B', 'C']
-        # B ['A', 'D']
-        # C ['A', 'D']
-        # D ['B', 'C']
+        # [('A', ['B', 'C']), ('B', ['A', 'D']), ('C', ['A', 'D']), ('D', ['B', 'C'])]
     """
-    # Imprime cada vértice e sua lista de adjacência
+    adj_list = []
     for key in graph:
-        print(key, graph[key])
+        adj_list.append((key, graph[key]))
+    return adj_list
         
 def get_adjacent_matrix(graph):
     """
-    Gera e imprime a matriz de adjacência de um grafo representado por um dicionário.
+    Retorna a matriz de adjacência de um grafo representado por um dicionário.
 
     Args:
         graph (dict): Um dicionário onde as chaves são os nós do grafo e os valores são listas de nós adjacentes.
 
     Returns:
-        None
+        list: Uma matriz de adjacência representada como uma lista de listas.
     """
-    # Obtém as chaves do grafo
-    keys_l = graph.keys()
-    # Cria uma matriz de adjacência usando numpy
-    matrix = np.array(graph[i] for i in keys_l)
-    print(matrix)
+    nodes = list(graph.keys())
+    size = len(nodes)
+    matrix = [[0] * size for _ in range(size)]
+    
+    node_index = {node: idx for idx, node in enumerate(nodes)}
+    
+    for node, adjacents in graph.items():
+        for adjacent in adjacents:
+            matrix[node_index[node]][node_index[adjacent]] = 1
+    
+    return matrix
+    
 
 def print_out(graph):
     """
-    Imprime informações sobre o grafo fornecido.
-
-    Parâmetros:
-    graph (dict): Um dicionário representando o grafo onde as chaves são os vértices
-                  e os valores são listas de vértices adjacentes.
-
-    Saída:
-    - Número de vértices no grafo.
-    - Número de arestas no grafo.
-    - Grau máximo do grafo.
-    - Grau mínimo do grafo.
-    - Lista de adjacência do grafo.
-    - Matriz de adjacência do grafo.
+    Imprime informações sobre um grafo em um arquivo de saída.
     """
-    # Imprime o número de vértices
-    print("Vertices: ", len(graph))
-    # Imprime o número de arestas (cada aresta é contada duas vezes)
-    print("Edges: ", sum(len(graph[k]) for k in graph)//2)
-    # Imprime o vértice com o maior grau
-    print(get_max_degree(graph))
-    # Imprime o vértice com o menor grau
-    print(get_min_degree(graph))
-    # Imprime a lista de adjacência
-    get_adjacent_list(graph)
-    # Imprime a matriz de adjacência
-    get_adjacent_matrix(graph)
+    text = f"Grafo\nNumero de vertices: {get_num_vertices(graph)}\nNumero de arestas: {get_num_edges(graph)}\nGrau Maximo: {get_max_degree(graph)}\nGrau Medio: {get_mean_degree(graph)}\nGrau Minimo: {get_min_degree(graph)}\nMediana dos Graus: {get_median_degree(graph)}\nLista de Adjacencia:{get_adjacent_list(graph)}\nMatriz de Adjacencia:\n"
     
+    with open('output.txt', 'w') as file:
+        file.write(text)
+        
+        matrix = get_adjacent_matrix(graph)
+        for row in matrix:
+            file.write(' '.join(map(str, row)) + '\n')
+        
+        
 # Caminho para o arquivo de entrada
 file_path = 'example_input.txt'
 # Lê o grafo do arquivo

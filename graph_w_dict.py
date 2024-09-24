@@ -178,11 +178,77 @@ def print_out(graph):
     
     with open('output.txt', 'w') as file:
         file.write(text)
-        
-        
+
+def bfs(graph, initial_vertice):
+    """
+    Realiza a busca em largura (BFS) em um grafo a partir de um vértice inicial.
+    Gera uma árvore de busca que contém o pai de cada vértice e o nível de cada vértice na árvore.
+    O vértice inicial terá nível 0.
+
+    Args:
+        graph (dict): Um dicionário onde as chaves são vértices e os valores são listas de vértices adjacentes.
+        initial_vertice (int): O vértice inicial a partir do qual a busca em largura será realizada.
+
+    Returns:
+        dict: Um dicionário que mapeia cada vértice ao seu pai e nível na árvore gerada pela BFS.
+    """
+
+    # 1. Define um fila vazia
+    queue = []
+
+    # 2. Marca o vertice inicial e o insere na fila
+    queue.append(initial_vertice)
+    visited = {initial_vertice: True}
+    parent = {initial_vertice: None}
+    level = {initial_vertice: 0}
+
+    # 3. Enquanto a fila não estiver vazia
+    while queue:
+        # 4. Retira o vertice do inicio da fila
+        current_vertice = queue.pop(0)
+        # 5. Para todo vizinho do vertice, faz
+        for neighbor in graph[current_vertice]:
+            # 6. Se o vizinho não estiver marcado, marca o vizinho e o insere no fim da fila
+            if neighbor not in visited:
+                visited[neighbor] = True
+                parent[neighbor] = current_vertice  # Define o pai do vértice
+                level[neighbor] = level[current_vertice] + 1  # Calcula o nível do vizinho
+                queue.append(neighbor)
+
+    return parent, level
+
+def bfs_tree_output(graph, initial_vertice):
+    """
+    Gera um arquivo de saída contendo a árvore de busca em largura (BFS).
+    O arquivo inclui o pai de cada vértice e o nível de cada vértice na árvore.
+
+    Args:
+        graph (dict): Um dicionário onde as chaves são vértices e os valores são listas de vértices adjacentes.
+        initial_vertice (int): O vértice inicial a partir do qual a busca em largura será realizada.
+    """
+    parent, level = bfs(graph, initial_vertice)
+    
+    # Escreve as informações da árvore em um arquivo de saída
+    with open('bfs_output.txt', 'w') as file:
+        file.write("Vértice, Pai, Nível\n")
+        for vertice in sorted(parent.keys()):
+            file.write(f"{vertice}, {parent[vertice]}, {level[vertice]}\n")
+
+# def dfs(graph, initial_vertice):
+    # 1. Marca o vertice inicial
+
+    # 2. Para cada aresta incidente ao vertice inicial
+
+        # 3. Se o vizinho não estiver marcado, faz a chamada recursiva
+    
+
 # Caminho para o arquivo de entrada
 file_path = 'grafo_1.txt'
 # Lê o grafo do arquivo
 graph = read_graph_from_file(file_path)
 # Imprime informações sobre o grafo
 print_out(graph)
+# Vértice inicial fornecido pelo usuário
+initial_vertice = 1
+# Gera a árvore de busca em largura
+bfs_tree_output(graph, initial_vertice)

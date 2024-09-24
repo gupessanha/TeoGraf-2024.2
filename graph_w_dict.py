@@ -176,7 +176,7 @@ def print_out(graph):
     """
     text = f"Grafo\nNumero de vertices: {get_num_vertices(graph)}\nNumero de arestas: {get_num_edges(graph)}\nGrau Maximo: {get_max_degree(graph)}\nGrau Medio: {get_mean_degree(graph)}\nGrau Minimo: {get_min_degree(graph)}\nMediana dos Graus: {get_median_degree(graph)}\nLista de Adjacencia:\n{get_adjacent_list(graph)}\nMatriz de Adjacencia:\n{get_adjacent_matrix(graph)}\n"
     
-    with open('output.txt', 'w') as file:
+    with open('outputs/output.txt', 'w') as file:
         file.write(text)
 
 def bfs(graph, initial_vertice):
@@ -229,21 +229,67 @@ def bfs_tree_output(graph, initial_vertice):
     parent, level = bfs(graph, initial_vertice)
     
     # Escreve as informações da árvore em um arquivo de saída
-    with open('bfs_output.txt', 'w') as file:
+    with open('outputs/bfs_output.txt', 'w') as file:
         file.write("Vértice, Pai, Nível\n")
         for vertice in sorted(parent.keys()):
             file.write(f"{vertice}, {parent[vertice]}, {level[vertice]}\n")
 
-# def dfs(graph, initial_vertice):
-    # 1. Marca o vertice inicial
+def dfs(graph, initial_vertice):
+    """
+    Realiza a busca em profundidade (DFS) em um grafo a partir de um vértice inicial.
+    Gera uma árvore de busca que contém o pai de cada vértice e o nível de cada vértice na árvore.
+    O vértice inicial terá nível 0.
 
-    # 2. Para cada aresta incidente ao vertice inicial
+    Args:
+        graph (dict): Um dicionário onde as chaves são vértices e os valores são listas de vértices adjacentes.
+        initial_vertice (int): O vértice inicial a partir do qual a busca em profundidade será realizada.
 
-        # 3. Se o vizinho não estiver marcado, faz a chamada recursiva
+    Returns:
+        dict: Um dicionário que mapeia cada vértice ao seu pai e nível na árvore gerada pela DFS.
+    """
+    # 1. Define uma pilha com o vertice inicial
+    stack = [initial_vertice]
+    visited = {}
+    parent = {initial_vertice: None}
+    level = {initial_vertice: 0}
+
+    # 2. Enquanto a pilha não estiver vazia
+    while stack:
+        # 3. Remove o vertice que está no topo da pilha
+        current_vertice = stack.pop()
+        # 4. Se ele não estiver marcado
+        if current_vertice not in visited:
+            # 5. Marca o vertice
+            visited[current_vertice] = True
+            # 6. Para cada vizinho desse vertice
+            for neighbor in sorted(graph[current_vertice], reverse=True):
+                # 7. Adiciona o vizinho no topo da pilha
+                if neighbor not in visited:
+                    stack.append(neighbor)
+                    parent[neighbor] = current_vertice  # Define o pai do vizinho
+                    level[neighbor] = level[current_vertice] + 1  # Define o nível do vizinho
+
+    return parent, level
+
+def dfs_tree_output(graph, initial_vertice):
+    """
+    Gera um arquivo de saída contendo a árvore de busca em profundidade (DFS).
+    O arquivo inclui o pai de cada vértice e o nível de cada vértice na árvore.
+
+    Args:
+        graph (dict): Um dicionário onde as chaves são vértices e os valores são listas de vértices adjacentes.
+        initial_vertice (int): O vértice inicial a partir do qual a busca em largura será realizada.
+    """
+    parent, level = dfs(graph, initial_vertice)
     
+    # Escreve as informações da árvore em um arquivo de saída
+    with open('outputs/dfs_output.txt', 'w') as file:
+        file.write("Vértice, Pai, Nível\n")
+        for vertice in sorted(parent.keys()):
+            file.write(f"{vertice}, {parent[vertice]}, {level[vertice]}\n")
 
 # Caminho para o arquivo de entrada
-file_path = 'grafo_1.txt'
+file_path = 'example_input.txt'
 # Lê o grafo do arquivo
 graph = read_graph_from_file(file_path)
 # Imprime informações sobre o grafo
@@ -252,3 +298,4 @@ print_out(graph)
 initial_vertice = 1
 # Gera a árvore de busca em largura
 bfs_tree_output(graph, initial_vertice)
+dfs_tree_output(graph, initial_vertice)

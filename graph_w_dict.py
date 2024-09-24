@@ -288,8 +288,23 @@ def dfs_tree_output(graph, initial_vertice):
         for vertice in sorted(parent.keys()):
             file.write(f"{vertice}, {parent[vertice]}, {level[vertice]}\n")
 
+def get_distance(graph, vertice_1, vertice_2):
+    """
+    Calcula a distância entre dois vértices de um grafo.
+
+    Args:
+        graph (dict): Um dicionário onde as chaves são vértices e os valores são listas de vértices adjacentes.
+        vertice_1: O primeiro vértice para se calcular a distância
+        vertice_2: O segundo vértice para se calcular a distância
+    
+    Returns:
+    distance: A distância encontrada entre os dois vértices
+    """
+    parent, level = bfs(graph, vertice_1)
+    return level.get(vertice_2)
+
 # Caminho para o arquivo de entrada
-file_path = 'example_input.txt'
+file_path = 'grafo_1.txt'
 # Lê o grafo do arquivo
 graph = read_graph_from_file(file_path)
 # Imprime informações sobre o grafo
@@ -297,5 +312,6 @@ print_out(graph)
 # Vértice inicial fornecido pelo usuário
 initial_vertice = 1
 # Gera a árvore de busca em largura
-bfs_tree_output(graph, initial_vertice)
-dfs_tree_output(graph, initial_vertice)
+# bfs_tree_output(graph, initial_vertice)
+# dfs_tree_output(graph, initial_vertice)
+print(get_distance(graph, 5194, 2450))

@@ -303,8 +303,68 @@ def get_distance(graph, vertice_1, vertice_2):
     parent, level = bfs(graph, vertice_1)
     return level.get(vertice_2)
 
+def connected_components(graph):
+    """
+    Encontra todas as componentes conexas de um grafo.
+    
+    Args:
+        graph (dict): Um dicionário onde as chaves são vértices e os valores são listas de vértices adjacentes.
+        
+    Returns:
+        list: Uma lista de componentes, onde cada componente é uma lista de vértices.
+              As componentes são ordenadas em ordem decrescente de tamanho.
+    """
+    visited = set()  # Conjunto para armazenar os vértices visitados
+    components = []  # Lista para armazenar as componentes
+
+    def aux_dfs(vertice, component):
+        """Função auxiliar que realiza uma DFS para encontrar todos os vértices de uma componente."""
+        # 1. Define uma pilha com o vertice inicial
+        stack = [vertice]
+
+        # 2. Enquanto a pilha não estiver vazia
+        while stack:
+            # 3. Remove o vertice que está no topo da pilha
+            v = stack.pop()
+            # 4. Se ele não estiver marcado
+            if v not in visited:
+                # 5. Marca o vertice
+                visited.add(v)
+                component.append(v)
+                # Adiciona os vizinhos não visitados à pilha
+                stack.extend([neighbor for neighbor in graph[v] if neighbor not in visited])
+
+    # Para cada vértice no grafo
+    for vertice in graph:
+        if vertice not in visited:
+            component = []  # Componente atual
+            aux_dfs(vertice, component)
+            components.append(component)
+
+    # Ordena as componentes em ordem decrescente de tamanho
+    components.sort(key=len, reverse=True)
+
+    return components
+
+def print_out_connected_components(graph):
+    """
+    Escreve as componentes conexas de um grafo em um arquivo de saída, o número de componentes e o tamanho de cada componente.
+    
+    Args:
+        graph (dict): Um dicionário onde as chaves são vértices e os valores são listas de vértices adjacentes.
+        output_file (str): O caminho para o arquivo onde os resultados serão salvos.
+    """
+    components = connected_components(graph)
+    
+    with open('outputs/connected_components_output.txt', 'w') as f:
+        f.write(f"Número de componentes conexas: {len(components)}\n")
+        for i, component in enumerate(components, start=1):
+            f.write(f"Componente {i} (Tamanho: {len(component)}): {component}\n")
+
+# -------------------------------------------------------------------------------------------------------------------------------------
+
 # Caminho para o arquivo de entrada
-file_path = 'grafo_1.txt'
+file_path = 'example_input.txt'
 # Lê o grafo do arquivo
 graph = read_graph_from_file(file_path)
 # Imprime informações sobre o grafo
@@ -313,5 +373,10 @@ print_out(graph)
 initial_vertice = 1
 # Gera a árvore de busca em largura
 # bfs_tree_output(graph, initial_vertice)
+
+# Gera a árvore de busca em profundidade
 # dfs_tree_output(graph, initial_vertice)
-print(get_distance(graph, 5194, 2450))
+# print(get_distance(graph, 5194, 2450))
+
+# Gera informações sobre componentes conexas
+print_out_connected_components(graph)

@@ -170,13 +170,13 @@ def get_adjacent_matrix(graph):
     return matrix_str
     
 
-def print_out(graph):
+def print_out(graph, output):
     """
     Imprime informações sobre um grafo em um arquivo de saída.
     """
     text = f"Grafo\nNumero de vertices: {get_num_vertices(graph)}\nNumero de arestas: {get_num_edges(graph)}\nGrau Maximo: {get_max_degree(graph)}\nGrau Medio: {get_mean_degree(graph)}\nGrau Minimo: {get_min_degree(graph)}\nMediana dos Graus: {get_median_degree(graph)}\nLista de Adjacencia:\n{get_adjacent_list(graph)}\nMatriz de Adjacencia:\n{get_adjacent_matrix(graph)}\n"
     
-    with open('outputs/output.txt', 'w') as file:
+    with open(output, 'w') as file:
         file.write(text)
 
 def bfs(graph, initial_vertice):
@@ -217,7 +217,7 @@ def bfs(graph, initial_vertice):
 
     return parent, level
 
-def bfs_tree_output(graph, initial_vertice):
+def print_out_bfs_tree(graph, initial_vertice, output):
     """
     Gera um arquivo de saída contendo a árvore de busca em largura (BFS).
     O arquivo inclui o pai de cada vértice e o nível de cada vértice na árvore.
@@ -225,11 +225,12 @@ def bfs_tree_output(graph, initial_vertice):
     Args:
         graph (dict): Um dicionário onde as chaves são vértices e os valores são listas de vértices adjacentes.
         initial_vertice (int): O vértice inicial a partir do qual a busca em largura será realizada.
+        output (str): O caminho para o arquivo onde os resultados serão salvos.
     """
     parent, level = bfs(graph, initial_vertice)
     
     # Escreve as informações da árvore em um arquivo de saída
-    with open('outputs/bfs_output.txt', 'w') as file:
+    with open(output, 'w') as file:
         file.write("Vértice, Pai, Nível\n")
         for vertice in sorted(parent.keys()):
             file.write(f"{vertice}, {parent[vertice]}, {level[vertice]}\n")
@@ -271,10 +272,11 @@ def dfs(graph, initial_vertice):
 
     return parent, level
 
-def dfs_tree_output(graph, initial_vertice):
+def print_out_dfs_tree(graph, initial_vertice, output):
     """
     Gera um arquivo de saída contendo a árvore de busca em profundidade (DFS).
     O arquivo inclui o pai de cada vértice e o nível de cada vértice na árvore.
+    output (str): O caminho para o arquivo onde os resultados serão salvos.
 
     Args:
         graph (dict): Um dicionário onde as chaves são vértices e os valores são listas de vértices adjacentes.
@@ -283,7 +285,7 @@ def dfs_tree_output(graph, initial_vertice):
     parent, level = dfs(graph, initial_vertice)
     
     # Escreve as informações da árvore em um arquivo de saída
-    with open('outputs/dfs_output.txt', 'w') as file:
+    with open(output, 'w') as file:
         file.write("Vértice, Pai, Nível\n")
         for vertice in sorted(parent.keys()):
             file.write(f"{vertice}, {parent[vertice]}, {level[vertice]}\n")
@@ -346,37 +348,75 @@ def connected_components(graph):
 
     return components
 
-def print_out_connected_components(graph):
+def print_out_connected_components(graph, output):
     """
     Escreve as componentes conexas de um grafo em um arquivo de saída, o número de componentes e o tamanho de cada componente.
     
     Args:
         graph (dict): Um dicionário onde as chaves são vértices e os valores são listas de vértices adjacentes.
-        output_file (str): O caminho para o arquivo onde os resultados serão salvos.
+        output (str): O caminho para o arquivo onde os resultados serão salvos.
     """
     components = connected_components(graph)
     
-    with open('outputs/connected_components_output.txt', 'w') as f:
+    with open(output, 'w') as f:
         f.write(f"Número de componentes conexas: {len(components)}\n")
         for i, component in enumerate(components, start=1):
             f.write(f"Componente {i} (Tamanho: {len(component)}): {component}\n")
 
+def get_diameter(graph):
+    max_diameter = 0
+
+    # 1. Pegar as componentes conexas do grafo
+    components = connected_components(graph)
+
+    # 2. Para cada componente, encontrar a maior distância mínima
+    for component in components:
+
+        # 3. Faz uma BFS de um vértice qualquer
+        initial_vertice = component[0]
+        parent, level = bfs(graph, initial_vertice)
+        farthest_vertice = max(level, key=level.get)
+
+        # 4. Faz uma BFS a partir do vértice mais distante daquele, garantindo que estamos numa extremidade
+        parent, level = bfs(graph, farthest_vertice)
+        component_diameter = max(level.values())
+
+        # 5. Guarda a maior distâcia
+        max_diameter = max(max_diameter, component_diameter)
+
+    return max_diameter
+
 # -------------------------------------------------------------------------------------------------------------------------------------
 
 # Caminho para o arquivo de entrada
-file_path = 'example_input.txt'
+file_path = 'inputs/example_input.txt'
+
 # Lê o grafo do arquivo
 graph = read_graph_from_file(file_path)
+
 # Imprime informações sobre o grafo
-print_out(graph)
+# print_out(graph, 'outputs/output.txt')
+
 # Vértice inicial fornecido pelo usuário
 initial_vertice = 1
+
+# Mostra o resultado da busca em largura
+# print(bfs(graph, initial_vertice))
+
 # Gera a árvore de busca em largura
-# bfs_tree_output(graph, initial_vertice)
+# print_out_bfs_tree(graph, initial_vertice, 'outputs/bfs_output.txt')
 
 # Gera a árvore de busca em profundidade
-# dfs_tree_output(graph, initial_vertice)
+# print_out_dfs_tree(graph, initial_vertice, 'outputs/dfs_output.txt')
+
+# Mostra a distância entre dois vértices
 # print(get_distance(graph, 5194, 2450))
 
+# Mostra o diâmetro de um grafo
+print(get_diameter(graph))
+
+# Mostra os componentes conexos
+# print(connected_components(graph))
+
 # Gera informações sobre componentes conexas
-print_out_connected_components(graph)
+# print_out_connected_components(graph, 'outputs/connected_components_output.txt')

@@ -1,5 +1,3 @@
-import numpy as np
-
 def read_graph_from_file(file_path):
     """
     Lê um grafo de um arquivo e retorna uma representação do grafo como um dicionário.

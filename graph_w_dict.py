@@ -1,3 +1,8 @@
+import psutil
+import os
+import time
+import random
+
 def read_graph_from_file(file_path):
     """
     Lê um grafo de um arquivo e retorna uma representação do grafo como um dicionário.
@@ -311,7 +316,7 @@ def connected_components(graph):
         graph (dict): Um dicionário onde as chaves são vértices e os valores são listas de vértices adjacentes.
         
     Returns:
-        list: Uma lista de componentes, onde cada componente é uma lista de vértices.
+        components: Uma lista de componentes, onde cada componente é uma lista de vértices.
               As componentes são ordenadas em ordem decrescente de tamanho.
     """
     visited = set()  # Conjunto para armazenar os vértices visitados
@@ -384,13 +389,44 @@ def get_diameter(graph):
 
     return max_diameter
 
+def print_memory():
+    process = psutil.Process(os.getpid())
+    # Converte o uso de memória de bytes para MB
+    memory_in_mb = process.memory_info().rss / (1024 * 1024)
+    print(f"Uso de memória: {memory_in_mb:.2f} MB")
+
+def measure_average_time(graph):
+    total_time = 0
+    vertices = list(graph.keys())  # Lista de vértices do grafo
+    
+    for _ in range(100):
+        initial_vertice = random.choice(vertices)  # Escolhe um vértice aleatório
+        start_time = time.time()  # Início da medição
+        bfs(graph, initial_vertice)  # Executa a BFS
+        end_time = time.time()  # Fim da medição
+        
+        total_time += (end_time - start_time)  # Acumula o tempo de execução
+    
+    average_time = total_time / 100  # Calcula o tempo médio
+    return average_time
+
 # -------------------------------------------------------------------------------------------------------------------------------------
 
 # Caminho para o arquivo de entrada
-file_path = 'inputs/example_input.txt'
+file_path = 'inputs/grafo_1.txt'
 
 # Lê o grafo do arquivo
 graph = read_graph_from_file(file_path)
+
+# Representando o grafo com matriz de adjacências
+# get_adjacent_matrix(graph)
+# print_memory()  # Medir o uso de memória
+# input("Pressione Enter para continuar...") # Pausando para verificar o uso de memória
+
+# Representando o grafo com lista de adjacências
+# get_adjacent_list(graph)
+# print_memory()  # Medir o uso de memória
+# input("Pressione Enter para continuar...") # Pausando para verificar o uso de memória
 
 # Imprime informações sobre o grafo
 # print_out(graph, 'outputs/output.txt')
@@ -411,10 +447,13 @@ initial_vertice = 1
 # print(get_distance(graph, 5194, 2450))
 
 # Mostra o diâmetro de um grafo
-print(get_diameter(graph))
+# print(get_diameter(graph))
 
 # Mostra os componentes conexos
 # print(connected_components(graph))
 
 # Gera informações sobre componentes conexas
 # print_out_connected_components(graph, 'outputs/connected_components_output.txt')
+
+# Medindo tempo médio de execução
+print(measure_average_time(graph))

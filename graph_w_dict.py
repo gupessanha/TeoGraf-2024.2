@@ -3,16 +3,14 @@ import os
 import time
 import random
 
-def read_graph_from_file(file_path):
+def read_weighted_graph_from_file(file_path):
     """
-    Lê um grafo de um arquivo e retorna uma representação do grafo como um dicionário.
-    O arquivo deve ter o seguinte formato:
-    - A primeira linha contém um número inteiro que representa o número de vértices.
-    - As linhas subsequentes contêm pares de inteiros que representam arestas entre vértices.
+    Lê um grafo com pesos de um arquivo e retorna um dicionário de listas de adjacência.
+
     Args:
         file_path (str): O caminho para o arquivo que contém a descrição do grafo.
     Returns:
-        dict: Um dicionário onde as chaves são vértices e os valores são listas de vértices adjacentes, ordenados em ordem crescente.
+        dict: Um dicionário onde as chaves são vértices e os valores são listas de tuplas (vértice adjacente, peso), ordenados em ordem crescente dos vértices adjacentes.
     """
     with open(file_path, 'r') as file:
         # Lê o número de vértices da primeira linha do arquivo
@@ -23,7 +21,7 @@ def read_graph_from_file(file_path):
         
         # Lê cada linha subsequente do arquivo para obter as arestas
         for line in file:
-            u, v = map(int, line.strip().split())
+            u, v, w = int(line.strip().split()[0]), int(line.strip().split()[1]), float(line.strip().split()[2])
             
             # Adiciona o vértice u ao grafo se ainda não estiver presente
             if u not in graph:
@@ -33,15 +31,16 @@ def read_graph_from_file(file_path):
             if v not in graph:
                 graph[v] = []
         
-            # Adiciona v à lista de adjacência de u e vice-versa
-            graph[u].append(v)
-            graph[v].append(u) 
+            # Adiciona (v, w) à lista de adjacência de u e (u, w) à lista de adjacência de v
+            graph[u].append((v, w))
+            graph[v].append((u, w))
             
         # Ordena as listas de adjacência para cada vértice
         for key in graph:
-            graph[key] = sorted(graph[key])
-        
+            graph[key] = sorted(graph[key], key=lambda x: x[0])
+    
     return graph
+
 
 def get_num_vertices(graph):
     """
@@ -413,10 +412,11 @@ def measure_average_time(graph):
 # -------------------------------------------------------------------------------------------------------------------------------------
 
 # Caminho para o arquivo de entrada
-file_path = 'inputs/grafo_1.txt'
+file_path = 'inputs/grafo_c_peso_0.txt'
 
 # Lê o grafo do arquivo
-graph = read_graph_from_file(file_path)
+graph = read_weighted_graph_from_file(file_path)
+print(graph)
 
 # Representando o grafo com matriz de adjacências
 # get_adjacent_matrix(graph)
@@ -456,4 +456,4 @@ initial_vertice = 1
 # print_out_connected_components(graph, 'outputs/connected_components_output.txt')
 
 # Medindo tempo médio de execução
-print(measure_average_time(graph))
+#print(measure_average_time(graph))

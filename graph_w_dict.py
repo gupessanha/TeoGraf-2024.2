@@ -409,8 +409,77 @@ def measure_average_time(graph):
     average_time = total_time / 100  # Calcula o tempo médio
     return average_time
 
+def dijkstra(graph, initial_vertice):
+    """
+    Realiza o algoritmo de Dijkstra para encontrar os menores caminhos a partir de um vértice inicial.
+    Retorna um dicionário com os menores caminhos e as distâncias associadas.
+
+    Args:
+        graph (dict): Um dicionário onde as chaves são vértices e os valores são listas de tuplas (vértice adjacente, peso).
+        initial_vertice (int): O vértice inicial a partir do qual os menores caminhos serão calculados.
+
+    Returns:
+        dict: Um dicionário que mapeia cada vértice ao seu pai e à distância do vértice inicial.
+        
+    """
+    # Verifica se existem pesos negativos
+    for vertice in graph:
+        for neighbor, weight in graph[vertice]:
+            if weight < 0:
+                raise ValueError("O grafo contém pesos negativos.")
+    
+    # Inicializa as estruturas de dados
+    distance = {v: float('inf') for v in graph}
+    parent = {v: None for v in graph}
+    path = {v: [] for v in graph}
+    distance[initial_vertice] = 0
+    visited = set()
+    
+    # Enquanto houver vértices não visitados
+    while visited != set(graph):
+        # Escolhe o vértice não visitado com menor distância
+        current_vertice = min((v for v in graph if v not in visited), key=lambda v: distance[v])
+        visited.add(current_vertice)
+        
+        # Atualiza as distâncias dos vizinhos do vértice atual
+        for neighbor, weight in graph[current_vertice]:
+            if neighbor not in visited and distance[current_vertice] + weight < distance[neighbor]:
+                distance[neighbor] = distance[current_vertice] + weight
+                parent[neighbor] = current_vertice
+                path[neighbor] = path[current_vertice] + [current_vertice]
+    
+    # Adiciona o vértice final ao caminho
+    for vertice in path:
+        path[vertice].append(vertice)
+                
+    return parent, distance, path
+
+def print_out_dijkstra(graph, initial_vertice, output):
+    """
+    Gera um arquivo de saída contendo os menores caminhos a partir de um vértice inicial.
+    O arquivo inclui o pai de cada vértice, a distância de cada vértice ao vértice inicial e o caminho.
+    
+    Args:
+        graph (dict): Um dicionário onde as chaves são vértices e os valores são listas de tuplas (vértice adjacente, peso).
+        initial_vertice (int): O vértice inicial a partir do qual os menores caminhos serão calculados.
+        output (str): O caminho para o arquivo onde os resultados serão salvos.
+    """
+    
+    parent, distance, path = dijkstra(graph, initial_vertice)
+    
+    with open(output, 'w') as file:
+        file.write("Vértice, Pai, Distância, Caminho\n")
+        for vertice in sorted(parent.keys()):
+            caminho = ' -> '.join(map(str, path[vertice]))
+            file.write(f"{vertice}, {parent[vertice]}, {distance[vertice]}, {caminho}; custo: {distance[vertice]}\n")
+            
+            
+
 # -------------------------------------------------------------------------------------------------------------------------------------
 
+    
+    
+    
 # Caminho para o arquivo de entrada
 file_path = 'inputs/grafo_c_peso_0.txt'
 
@@ -418,6 +487,7 @@ file_path = 'inputs/grafo_c_peso_0.txt'
 graph = read_weighted_graph_from_file(file_path)
 print(graph)
 
+print_out_dijkstra(graph, 1, 'outputs/dijkstra_output.txt')
 # Representando o grafo com matriz de adjacências
 # get_adjacent_matrix(graph)
 # print_memory()  # Medir o uso de memória
@@ -457,3 +527,4 @@ initial_vertice = 1
 
 # Medindo tempo médio de execução
 #print(measure_average_time(graph))
+

@@ -2,6 +2,7 @@ import psutil
 import os
 import time
 import random
+import heapq
 
 def read_weighted_graph_from_file(file_path):
     """
@@ -454,7 +455,49 @@ def dijkstra(graph, initial_vertice):
                 
     return parent, distance, path
 
-def print_out_dijkstra(graph, initial_vertice, output):
+def heap_dijkstra(graph, initial_vertice):
+    """
+    Realiza o algoritmo de Dijkstra utilizando uma fila de prioridade (heap) para encontrar os menores caminhos a partir de um vértice inicial.
+    
+    Args:
+        graph (dict): Um dicionário onde as chaves são vértices e os valores são listas de tuplas (vértice adjacente, peso).
+        initial_vertice (int): O vértice inicial a partir do qual os menores caminhos serão calculados.
+    """
+    # Verifica se existem pesos negativos
+    for vertice in graph:
+        for neighbor, weight in graph[vertice]:
+            if weight < 0:
+                raise ValueError("O grafo contém pesos negativos.")
+    
+    # Inicializa as estruturas de dados
+    distance = {v: float('inf') for v in graph}
+    parent = {v: None for v in graph}
+    path = {v: [] for v in graph}
+    distance[initial_vertice] = 0
+    visited = set()
+    heap = [(0, initial_vertice)]
+    
+    # Enquanto houver vértices não visitados
+    while visited != set(graph):
+        # Escolhe o vértice não visitado com menor distância
+        current_distance, current_vertice = heapq.heappop(heap)
+        visited.add(current_vertice)
+        
+        # Atualiza as distâncias dos vizinhos do vértice atual
+        for neighbor, weight in graph[current_vertice]:
+            if neighbor not in visited and current_distance + weight < distance[neighbor]:
+                distance[neighbor] = current_distance + weight
+                parent[neighbor] = current_vertice
+                path[neighbor] = path[current_vertice] + [current_vertice]
+                heapq.heappush(heap, (distance[neighbor], neighbor))
+                
+    # Adiciona o vértice final ao caminho
+    for vertice in path:
+        path[vertice].append(vertice)
+        
+    return parent, distance, path
+
+def print_out_dijkstra(graph, initial_vertice, output, heap=False):
     """
     Gera um arquivo de saída contendo os menores caminhos a partir de um vértice inicial.
     O arquivo inclui o pai de cada vértice, a distância de cada vértice ao vértice inicial e o caminho.
@@ -464,14 +507,32 @@ def print_out_dijkstra(graph, initial_vertice, output):
         initial_vertice (int): O vértice inicial a partir do qual os menores caminhos serão calculados.
         output (str): O caminho para o arquivo onde os resultados serão salvos.
     """
-    
-    parent, distance, path = dijkstra(graph, initial_vertice)
+    if heap == False:
+        parent, distance, path = dijkstra(graph, initial_vertice)
+    else:
+        parent, distance, path = heap_dijkstra(graph, initial_vertice)
     
     with open(output, 'w') as file:
         file.write("Vértice, Pai, Distância, Caminho\n")
         for vertice in sorted(parent.keys()):
             caminho = ' -> '.join(map(str, path[vertice]))
             file.write(f"{vertice}, {parent[vertice]}, {distance[vertice]}, {caminho}; custo: {distance[vertice]}\n")
+            
+def compare_dijkstra_algorithms(graph, initial_vertice):
+    # Executa o algoritmo de Dijkstra sem heap
+    start_time = time.time()
+    print_out_dijkstra(graph, initial_vertice, 'outputs/dijkstra_output.txt', heap=False)
+    end_time = time.time()
+    time_without_heap = end_time - start_time
+
+    # Executa o algoritmo de Dijkstra com heap
+    start_time = time.time()
+    print_out_dijkstra(graph, initial_vertice, 'outputs/dijkstra_heap_output.txt', heap=True)
+    end_time = time.time()
+    time_with_heap = end_time - start_time
+
+    return time_without_heap, time_with_heap
+
             
             
 
@@ -481,13 +542,14 @@ def print_out_dijkstra(graph, initial_vertice, output):
     
     
 # Caminho para o arquivo de entrada
-file_path = 'inputs/grafo_c_peso_0.txt'
+#file_path = 'inputs/grafo_c_peso_0.txt'
+file_path = 'inputs/grafo_W_1.txt'
 
 # Lê o grafo do arquivo
 graph = read_weighted_graph_from_file(file_path)
-print(graph)
+#print(graph)
 
-print_out_dijkstra(graph, 1, 'outputs/dijkstra_output.txt')
+#print_out_dijkstra(graph, 1, 'outputs/dijkstra_output.txt')
 # Representando o grafo com matriz de adjacências
 # get_adjacent_matrix(graph)
 # print_memory()  # Medir o uso de memória
@@ -528,3 +590,9 @@ initial_vertice = 1
 # Medindo tempo médio de execução
 #print(measure_average_time(graph))
 
+
+    
+# Compara o desempenho do algoritmo de Dijkstra com e sem heap
+
+
+print(compare_dijkstra_algorithms(graph, initial_vertice))

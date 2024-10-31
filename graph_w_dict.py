@@ -395,21 +395,6 @@ def print_memory():
     memory_in_mb = process.memory_info().rss / (1024 * 1024)
     print(f"Uso de memória: {memory_in_mb:.2f} MB")
 
-def measure_average_time(graph):
-    total_time = 0
-    vertices = list(graph.keys())  # Lista de vértices do grafo
-    
-    for _ in range(100):
-        initial_vertice = random.choice(vertices)  # Escolhe um vértice aleatório
-        start_time = time.time()  # Início da medição
-        bfs(graph, initial_vertice)  # Executa a BFS
-        end_time = time.time()  # Fim da medição
-        
-        total_time += (end_time - start_time)  # Acumula o tempo de execução
-    
-    average_time = total_time / 100  # Calcula o tempo médio
-    return average_time
-
 def dijkstra(graph, initial_vertice):
     """
     Realiza o algoritmo de Dijkstra para encontrar os menores caminhos a partir de um vértice inicial.
@@ -517,7 +502,8 @@ def print_out_dijkstra(graph, initial_vertice, output, heap=False):
         for vertice in sorted(parent.keys()):
             caminho = ' -> '.join(map(str, path[vertice]))
             file.write(f"{vertice}, {parent[vertice]}, {distance[vertice]}, {caminho}; custo: {distance[vertice]}\n")
-            
+
+
 def compare_dijkstra_algorithms(graph, initial_vertice):
     # Executa o algoritmo de Dijkstra sem heap
     start_time = time.time()
@@ -533,23 +519,27 @@ def compare_dijkstra_algorithms(graph, initial_vertice):
 
     return time_without_heap, time_with_heap
 
-            
-            
+def measure_average_time_w(graph, k, heap=False):
+    total_time = 0
+    vertices = list(graph.keys())  # Lista de vértices do grafo
+    
+    for _ in range(k):
+        initial_vertice = random.choice(vertices)  # Escolhe um vértice aleatório
+        start_time = time.time()  # Início da medição
+        if heap == False:
+            dijkstra(graph, initial_vertice)
+        else:
+            heap_dijkstra(graph, initial_vertice)
+        end_time = time.time()  # Fim da medição
+        
+        total_time += (end_time - start_time)  # Acumula o tempo de execução
+    
+    average_time = total_time / k  # Calcula o tempo médio
+    return average_time
+
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 
-    
-    
-    
-# Caminho para o arquivo de entrada
-#file_path = 'inputs/grafo_c_peso_0.txt'
-file_path = 'inputs/grafo_W_1.txt'
-
-# Lê o grafo do arquivo
-graph = read_weighted_graph_from_file(file_path)
-#print(graph)
-
-#print_out_dijkstra(graph, 1, 'outputs/dijkstra_output.txt')
 # Representando o grafo com matriz de adjacências
 # get_adjacent_matrix(graph)
 # print_memory()  # Medir o uso de memória
@@ -564,7 +554,7 @@ graph = read_weighted_graph_from_file(file_path)
 # print_out(graph, 'outputs/output.txt')
 
 # Vértice inicial fornecido pelo usuário
-initial_vertice = 1
+# initial_vertice = 1
 
 # Mostra o resultado da busca em largura
 # print(bfs(graph, initial_vertice))
@@ -590,9 +580,23 @@ initial_vertice = 1
 # Medindo tempo médio de execução
 #print(measure_average_time(graph))
 
+# Caminho para o arquivo de entrada
+#file_path = 'inputs/grafo_c_peso_0.txt'
+# file_path = 'inputs/grafo_W_1.txt'
+# file_path = 'inputs/grafo_W_2.txt'
+# file_path = 'inputs/grafo_W_3.txt'
+# file_path = 'inputs/grafo_W_4.txt'
+# file_path = 'inputs/grafo_W_5.txt'
+# file_path = 'inputs/rede_colaboracao.txt'
 
+# Lê o grafo do arquivo
+# graph = read_weighted_graph_from_file(file_path)
+
+# Imprime a saída da arvore de dijkstra
+# print_out_dijkstra(graph, 2722, 'outputs/graph_W_5.txt', True)   
+
+# Medindo tempo médio de execução
+# print(measure_average_time_w(graph, 1, True))
     
 # Compara o desempenho do algoritmo de Dijkstra com e sem heap
-
-
-print(compare_dijkstra_algorithms(graph, initial_vertice))
+# print(compare_dijkstra_algorithms(graph, initial_vertice))

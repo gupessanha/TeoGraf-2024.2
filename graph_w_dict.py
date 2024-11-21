@@ -549,65 +549,133 @@ def measure_average_time_w(graph, k, heap=False):
 
 # -------------------------------------------------------------------------------------------------------------------------------------
 
-# Representando o grafo com matriz de adjacências
-# get_adjacent_matrix(graph)
-# print_memory()  # Medir o uso de memória
-# input("Pressione Enter para continuar...") # Pausando para verificar o uso de memória
+def bfs_augmenting_path(graph, initial_vertice, final_vertice):
+    """
+    Encontra um caminho aumentante no grafo residual usando BFS.
 
-# Representando o grafo com lista de adjacências
-# get_adjacent_list(graph)
-# print_memory()  # Medir o uso de memória
-# input("Pressione Enter para continuar...") # Pausando para verificar o uso de memória
+    Args:
+        graph (dict): O grafo residual, onde as chaves são vértices e os valores são dicionários (vértice adjacente: capacidade residual).
+        initial_vertice (int): O vértice inicial.
+        final_vertice (int): O vértice final.
 
-# Imprime informações sobre o grafo
-# print_out(graph, 'outputs/output.txt')
+    Returns:
+        list: O caminho aumentante encontrado como uma lista de vértices, ou uma lista vazia se não houver caminho.
+    """
+    # 1. Define um fila vazia
+    queue = []
 
-# Vértice inicial fornecido pelo usuário
-# initial_vertice = 1
+    # 2. Marca o vertice inicial e o insere na fila
+    queue.append(initial_vertice)
+    visited = {initial_vertice: True}
+    parent = {initial_vertice: None}
 
-# Mostra o resultado da busca em largura
-# print(bfs(graph, initial_vertice))
+    # 3. Enquanto a fila não estiver vazia
+    while queue:
+        # 4. Retira o vertice do inicio da fila
+        current_vertice = queue.pop(0)
+        # 5. Para todo vizinho do vertice, faz
+        for neighbor, capacity in graph[current_vertice].items():
+            # 6. Se o vizinho não estiver marcado, marca o vizinho e o insere no fim da fila. Apenas considera arestas com capacidade residual positiva
+            if neighbor not in visited and capacity > 0:
+                visited[neighbor] = True
+                parent[neighbor] = current_vertice  # Define o pai do vértice
+                queue.append(neighbor)
+                # Se o vértice vizinho for o final, encontrou o caminho
+                if neighbor == final_vertice:
+                    break
 
-# Gera a árvore de busca em largura
-# print_out_bfs_tree(graph, initial_vertice, 'outputs/bfs_output.txt')
+    # Reconstrói o caminho do final ao inicial
+    path = []
+    v = final_vertice
+    while v is not None:
+        path.insert(0, v)
+        v = parent.get(v)
 
-# Gera a árvore de busca em profundidade
-# print_out_dfs_tree(graph, initial_vertice, 'outputs/dfs_output.txt')
-
-# Mostra a distância entre dois vértices
-# print(get_distance(graph, 5194, 2450))
-
-# Mostra o diâmetro de um grafo
-# print(get_diameter(graph))
-
-# Mostra os componentes conexos
-# print(connected_components(graph))
-
-# Gera informações sobre componentes conexas
-# print_out_connected_components(graph, 'outputs/connected_components_output.txt')
-
-# Medindo tempo médio de execução
-#print(measure_average_time(graph))
-
-# Caminho para o arquivo de entrada
-file_path = 'inputs/grafo_c_peso_0.txt'
-# file_path = 'inputs/grafo_W_1.txt'
-# file_path = 'inputs/grafo_W_2.txt'
-# file_path = 'inputs/grafo_W_3.txt'
-# file_path = 'inputs/grafo_W_4.txt'
-# file_path = 'inputs/grafo_W_5.txt'
-# file_path = 'inputs/rede_colaboracao.txt'
-
-# Lê o grafo do arquivo
-graph = read_graph_from_file(file_path, True, True)
-
-print(graph)
-
-# Imprime a saída da arvore de dijkstra
-# print_out_dijkstra(graph, 2722, 'outputs/graph_W_5.txt', True)   
-
-# Medindo tempo médio de execução
-# print(measure_average_time_w(graph, 1, True))
+    # Verifica se o caminho conecta o final ao inicial
+    if path[0] == initial_vertice:
+        return path
+    else:
+        return []
     
-# Compara o desempenho do algoritmo de Dijkstra com e sem heap
-# print(compare_dijkstra_algorithms(graph, initial_vertice))
+def create_residual_graph(graph):
+    """
+    Cria o grafo residual a partir do grafo original.
+
+    Args:
+        graph (dict): O grafo original, representado como um dicionário de listas de adjacência, 
+                      onde cada entrada é (vértice adjacente, peso).
+
+    Returns:
+        dict: O grafo residual, representado como um dicionário de dicionários.
+              Cada chave é um vértice, e o valor é outro dicionário de (vértice adjacente: capacidade residual).
+    """
+    residual_graph = {}
+    
+    for u in graph:
+        if u not in residual_graph:
+            residual_graph[u] = {}
+        for v, capacity in graph[u]:
+            # Adiciona a aresta original
+            residual_graph[u][v] = capacity
+            # Adiciona a aresta reversa com capacidade inicial 0
+            if v not in residual_graph:
+                residual_graph[v] = {}
+            residual_graph[v][u] = 0  # Aresta reversa começa com capacidade 0
+    
+    return residual_graph
+
+def ford_fulkerson(graph, initial_vertice, final_vertice):
+    """
+    Implementação do algoritmo de Ford-Fulkerson para encontrar o fluxo máximo.
+
+    Args:
+        graph (dict): Grafo representado como um dicionário de listas de adjacência, com tuplas (vértice adjacente, peso).
+        initial_vertice (int): Vértice inicial.
+        final_vertice (int): Vértice final.
+
+    Returns:
+        float: O fluxo máximo.
+    """
+     # Inicializa o fluxo máximo
+    max_flow = 0
+
+    # Cria o grafo residual
+    residual_graph = create_residual_graph(graph)
+    print(residual_graph)
+
+    # Enquanto houver caminho aumentante no grafo residual:
+    while True:
+        # Encontra um caminho aumentante no grafo residual
+        path = bfs_augmenting_path(residual_graph, initial_vertice, final_vertice)
+
+        if not path:  # Se não houver caminho aumentante, encerra
+            break
+
+        # Determina o gargalo (capacidade mínima ao longo do caminho)
+        bottleneck = float('Inf')
+        for i in range(len(path) - 1):
+            u, v = path[i], path[i + 1]
+            bottleneck = min(bottleneck, residual_graph[u][v])
+
+        # Atualiza o grafo residual
+        for i in range(len(path) - 1):
+            u, v = path[i], path[i + 1]
+            # Reduz a capacidade da aresta no sentido original
+            residual_graph[u][v] -= bottleneck
+            # Aumenta a capacidade da aresta reversa
+            residual_graph[v][u] += bottleneck
+
+        # Incrementa o fluxo máximo
+        max_flow += bottleneck
+
+    return max_flow
+
+
+# -------------------------------------------------------------------------------------------------------------------------------------
+
+# Carrega o grafo do arquivo
+graph = read_graph_from_file("inputs/grafo_direcionado_teste.txt", weighted=True, directed=True)
+
+# Calcula o fluxo máximo
+max_flow = ford_fulkerson(graph, initial_vertice=6, final_vertice=7)
+print(f"Fluxo máximo: {max_flow}")

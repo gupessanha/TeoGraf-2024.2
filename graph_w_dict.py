@@ -4,7 +4,7 @@ import time
 import random
 import heapq
 
-def read_weighted_graph_from_file(file_path):
+def read_graph_from_file(file_path, weighted=True, directed=False):
     """
     Lê um grafo com pesos de um arquivo e retorna um dicionário de listas de adjacência.
 
@@ -32,9 +32,18 @@ def read_weighted_graph_from_file(file_path):
             if v not in graph:
                 graph[v] = []
         
-            # Adiciona (v, w) à lista de adjacência de u e (u, w) à lista de adjacência de v
-            graph[u].append((v, w))
-            graph[v].append((u, w))
+            # Adiciona arestas e pesos à lista de adjacências
+            if weighted:
+                graph[u].append((v, w))
+                # Se o grafo não for direcionado, adiciona a aresta de volta:
+                if directed == False:
+                    graph[v].append((u, w))
+            else:
+                graph[u].append((v))
+                # Se o grafo não for direcionado, adiciona a aresta de volta:
+                if directed == False:
+                    graph[v].append((u))
+            
             
         # Ordena as listas de adjacência para cada vértice
         for key in graph:
@@ -581,7 +590,7 @@ def measure_average_time_w(graph, k, heap=False):
 #print(measure_average_time(graph))
 
 # Caminho para o arquivo de entrada
-#file_path = 'inputs/grafo_c_peso_0.txt'
+file_path = 'inputs/grafo_c_peso_0.txt'
 # file_path = 'inputs/grafo_W_1.txt'
 # file_path = 'inputs/grafo_W_2.txt'
 # file_path = 'inputs/grafo_W_3.txt'
@@ -590,7 +599,9 @@ def measure_average_time_w(graph, k, heap=False):
 # file_path = 'inputs/rede_colaboracao.txt'
 
 # Lê o grafo do arquivo
-# graph = read_weighted_graph_from_file(file_path)
+graph = read_graph_from_file(file_path, True, True)
+
+print(graph)
 
 # Imprime a saída da arvore de dijkstra
 # print_out_dijkstra(graph, 2722, 'outputs/graph_W_5.txt', True)   

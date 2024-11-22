@@ -641,7 +641,6 @@ def ford_fulkerson(graph, initial_vertice, final_vertice):
 
     # Cria o grafo residual
     residual_graph = create_residual_graph(graph)
-    print(residual_graph)
 
     # Enquanto houver caminho aumentante no grafo residual:
     while True:
@@ -671,11 +670,53 @@ def ford_fulkerson(graph, initial_vertice, final_vertice):
     return max_flow
 
 
+def measure_ff_execution_time(graph, initial_vertice, final_vertice, iterations=10):
+    """
+    Mede o tempo médio de execução do algoritmo Ford-Fulkerson.
+
+    Args:
+        graph (dict): O grafo a ser processado.
+        initial_vertice (int): O vértice fonte.
+        final_vertice (int): O vértice sumidouro.
+        iterations (int): Número de vezes para executar o algoritmo.
+
+    Returns:
+        tuple: (fluxo_medio, tempo_medio_em_segundos)
+    """
+    times = []
+    max_flows = []
+
+    for _ in range(iterations):
+        start_time = time.time()
+        max_flow = ford_fulkerson(graph, initial_vertice, final_vertice)
+        end_time = time.time()
+
+        times.append(end_time - start_time)
+        max_flows.append(max_flow)
+
+    return sum(max_flows) / len(max_flows), sum(times) / len(times)
+
+
 # -------------------------------------------------------------------------------------------------------------------------------------
 
 # Carrega o grafo do arquivo
-graph = read_graph_from_file("inputs/grafo_direcionado_teste.txt", weighted=True, directed=True)
+# graph = read_graph_from_file("inputs/grafo_direcionado_teste.txt", weighted=True, directed=True)
 
-# Calcula o fluxo máximo
-max_flow = ford_fulkerson(graph, initial_vertice=6, final_vertice=7)
-print(f"Fluxo máximo: {max_flow}")
+# # Calcula o fluxo máximo
+# max_flow = ford_fulkerson(graph, initial_vertice=6, final_vertice=7)
+# print(f"Fluxo máximo: {max_flow}")
+
+initial = 1
+final = 2
+
+input_file = "inputs/grafo_rf_2.txt"
+
+graph = read_graph_from_file(input_file, True, True)
+
+# max_flow, avg_time = measure_ff_execution_time(graph, initial, final)
+max_flow = ford_fulkerson(graph, initial, final)
+
+print("Fluxo máximo: ")
+print(max_flow)
+# print("Tempo médio: ")
+# print(avg_time)
